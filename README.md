@@ -2,6 +2,10 @@
 
 Aplicación web básica para gestionar estudiantes, desarrollada como parte del **Taller SQL - Bases de Datos I** de la Universidad Tecnológica de Pereira (UTP).
 
+## Vista previa
+
+![Gestión de Estudiantes](docs/Captura%20de%20pantalla%202026-05-21%20111632.png)
+
 ## Descripción
 
 Permite **agregar** y **visualizar** estudiantes almacenados en una base de datos PostgreSQL, usando PHP y Python (Flask) como backends, y HTML puro como frontend.
