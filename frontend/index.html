@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Estudiantes</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #2c3e50; }
+        h2 { color: #34495e; margin-top: 30px; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 16px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #1a6fa8; }
+        #mensaje { margin-top: 10px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background: #2c3e50; color: white; }
+        tr:nth-child(even) { background: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Gestión de Estudiantes - UTP</h1>
+
+    <h2>Agregar Estudiante</h2>
+    <input type="text" id="nombre" placeholder="Nombre completo" />
+    <input type="number" id="edad" placeholder="Edad" min="0" max="150" />
+    <button onclick="agregarEstudiante()">Agregar</button>
+    <p id="mensaje"></p>
+
+    <h2>Lista de Estudiantes</h2>
+    <button onclick="cargarEstudiantes()">Actualizar lista</button>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Nombre</th><th>Edad</th></tr>
+        </thead>
+        <tbody id="tabla-estudiantes"></tbody>
+    </table>
+
+    <script>
+        async function agregarEstudiante() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const edad   = document.getElementById('edad').value;
+            const msg    = document.getElementById('mensaje');
+
+            if (!nombre || !edad) {
+                msg.style.color = 'red';
+                msg.textContent = 'Por favor completa todos los campos.';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('nombre', nombre);
+            formData.append('edad', edad);
+
+            try {
+                const res  = await fetch('http://localhost:8000/agregar.php', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (res.ok) {
+                    msg.style.color = 'green';
+                    msg.textContent = data.mensaje + ' (ID: ' + data.id + ')';
+                    document.getElementById('nombre').value = '';
+                    document.getElementById('edad').value   = '';
+                    cargarEstudiantes();
+                } else {
+                    msg.style.color = 'red';
+                    msg.textContent = data.error;
+                }
+            } catch (e) {
+                msg.style.color = 'red';
+                msg.textContent = 'Error al conectar con el servidor PHP.';
+            }
+        }
+
+        async function cargarEstudiantes() {
+            try {
+                const res  = await fetch('http://localhost:5000/estudiantes');
+                const data = await res.json();
+                const tbody = document.getElementById('tabla-estudiantes');
+                tbody.innerHTML = '';
+                data.forEach(e => {
+                    tbody.innerHTML += `<tr><td>${e.id}</td><td>${e.nombre}</td><td>${e.edad}</td></tr>`;
+                });
+            } catch (e) {
+                alert('Error al conectar con la API Flask.');
+            }
+        }
+
+        cargarEstudiantes();
+    </script>
+</body>
+</html>
